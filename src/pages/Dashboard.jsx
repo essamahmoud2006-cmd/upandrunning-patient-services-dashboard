@@ -21,14 +21,20 @@ export default function Dashboard() {
 
   const handleImportFile = async (file) => {
     if (!file) return;
+    const lower = file.name.toLowerCase();
+    if (!lower.endsWith('.csv') && !lower.endsWith('.txt') && !lower.endsWith('.xlsx') && !lower.endsWith('.xls')) {
+      dash.setImportSummary({ error: "That file type isn't supported. Use the .csv or .xlsx export from Insta HMS." });
+      return;
+    }
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const res = await base44.functions.invoke('importCancellationsReport', { file_url, date });
+      const res = await base44.functions.invoke('importCancellationsReport', { file_url, date, file_name: file.name });
       dash.setImportSummary(res.data);
       await dash.reload();
     } catch (e) {
-      dash.setImportSummary({ error: (e && e.message) || 'Import failed. Try re-exporting the report, or paste it in instead.' });
+      const msg = e?.response?.data?.error || e?.message || 'Import failed. Try re-exporting the report, or paste it in instead.';
+      dash.setImportSummary({ error: msg });
     }
     setUploading(false);
   };

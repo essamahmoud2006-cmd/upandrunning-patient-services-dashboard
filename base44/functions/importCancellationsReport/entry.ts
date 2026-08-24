@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import * as XLSX from 'npm:xlsx@0.18.5';
 
 const CENTER_MAP = {
   sports: 'alwasl',
@@ -14,6 +15,30 @@ const CENTER_MAP = {
   'studio republik': 'szr',
 };
 
+function parseCsvLine(line) {
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; } else { inQuotes = false; }
+      } else { cur += ch; }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { result.push(cur); cur = ''; }
+      else cur += ch;
+    }
+  }
+  result.push(cur);
+  return result.map((s) => s.trim());
+}
+
+function normalizeHeader(h) {
+  return String(h || '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
 function cleanName(n) {
   return String(n || '').replace(/^(mrs|miss|mr|ms|dr)\.?\s*/i, '').replace(/\s+/g, ' ').trim();
 }
@@ -27,41 +52,45 @@ export default async function (req) {
     const body = await req.json();
     const fileUrl = body.file_url;
     const date = body.date;
+    const fileName = body.file_name || '';
     if (!fileUrl || !date) return Response.json({ error: 'Missing file_url or date' }, { status: 400 });
 
-    const schema = {
-      type: 'object',
-      properties: {
-        cancellations: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              patient_name: { type: 'string' },
-              mr_no: { type: 'string' },
-              consultant: { type: 'string' },
-              center_name: { type: 'string' },
-              cancel_reason: { type: 'string' },
-              phone: { type: 'string' },
-              booking_status: { type: 'string' },
-            },
-          },
-        },
-      },
-    };
+    const dl = await fetch(fileUrl);
+    if (!dl.ok) return Response.json({ error: 'Could not download the uploaded file. Please try again.' }, { status: 422 });
 
-    const extraction = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
-      file_url: fileUrl,
-      json_schema: schema,
-    });
-
+    const lower = fileName.toLowerCase();
     let rows = [];
-    if (extraction && extraction.status === 'success' && extraction.output) {
-      const out = extraction.output;
-      rows = Array.isArray(out) ? out : out.cancellations || [];
+    if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
+      const buf = await dl.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
     } else {
-      return Response.json({ error: (extraction && extraction.details) || 'Could not extract data from file' }, { status: 422 });
+      const text = await dl.text();
+      rows = text.split(/\r?\n/).filter((l) => l.trim().length).map(parseCsvLine);
     }
+
+    let headerIdx = -1;
+    let headerFields = null;
+    for (let i = 0; i < rows.length; i++) {
+      const fields = rows[i].map((f) => (f == null ? '' : String(f)).trim());
+      if (fields.some((f) => normalizeHeader(f) === 'patientname')) { headerIdx = i; headerFields = fields; break; }
+    }
+    if (headerIdx === -1) {
+      return Response.json({ error: 'Could not find a "Patient Name" column in that file. Make sure it is the Insta HMS cancellations export with its header row intact.' }, { status: 422 });
+    }
+
+    const norm = headerFields.map(normalizeHeader);
+    const phoneIdx = norm.findIndex((h) => h.indexOf('mobile') >= 0 || h.indexOf('phone') >= 0 || h.indexOf('contact') >= 0 || h.indexOf('tel') >= 0);
+    const col = {
+      center: norm.indexOf('centername'),
+      mrno: norm.indexOf('mrno'),
+      consultant: norm.indexOf('consultant'),
+      patient: norm.indexOf('patientname'),
+      reason: norm.indexOf('cancelreason'),
+      phone: phoneIdx,
+      lastIdx: headerFields.length - 1,
+    };
 
     const existing = await base44.entities.Cancellation.filter({ date }, '-created_date', 2000);
     const perLocationNew = {};
@@ -70,22 +99,21 @@ export default async function (req) {
     let totalNew = 0, totalDup = 0, totalUnmapped = 0;
     const toCreate = [];
 
-    for (const row of rows) {
-      const patientRaw = String(row.patient_name || '').trim();
+    for (let i = headerIdx + 1; i < rows.length; i++) {
+      const fields = rows[i].map((f) => (f == null ? '' : String(f)).trim());
+      if (fields.length < 2 || fields.every((f) => !f)) continue;
+      const centerRaw = (fields[col.center] || '').trim();
+      const patientRaw = (fields[col.patient] || '').trim();
       if (!patientRaw) continue;
-      const centerRaw = String(row.center_name || '').trim();
       const locKey = CENTER_MAP[centerRaw.toLowerCase()];
-      if (!locKey) {
-        if (centerRaw) { unmapped[centerRaw] = (unmapped[centerRaw] || 0) + 1; totalUnmapped++; }
-        continue;
-      }
+      if (!locKey) { if (centerRaw) { unmapped[centerRaw] = (unmapped[centerRaw] || 0) + 1; totalUnmapped++; } continue; }
       const name = cleanName(patientRaw);
       if (!name) continue;
-      const mrNo = String(row.mr_no || '').trim();
-      const consultant = String(row.consultant || '').trim();
-      const reason = String(row.cancel_reason || '').trim();
-      const phone = String(row.phone || '').trim();
-      const bookingStatus = String(row.booking_status || '').trim().toLowerCase();
+      const mrNo = col.mrno >= 0 ? (fields[col.mrno] || '').trim() : '';
+      const consultant = col.consultant >= 0 ? (fields[col.consultant] || '').trim() : '';
+      const reason = col.reason >= 0 ? (fields[col.reason] || '').trim() : '';
+      const phone = col.phone >= 0 ? (fields[col.phone] || '').trim() : '';
+      const bookingStatus = (fields[col.lastIdx] || '').trim().toLowerCase();
       const recouped = bookingStatus === 'booked';
 
       const isDup = existing.some((p) => (mrNo && p.mrNo ? p.mrNo === mrNo : p.name.toLowerCase() === name.toLowerCase()));

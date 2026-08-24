@@ -13,7 +13,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <button
             onClick={() => onShift(-1)}
             aria-label="Previous day"
-            className="w-8 h-8 rounded-md border border-[#ddd] bg-white text-[#006272] text-base cursor-pointer hover:bg-[#E6EEEF]"
+            className="w-8 h-8 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-base cursor-pointer hover:bg-[#fbeae7]"
           >
             ‹
           </button>
@@ -26,7 +26,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <button
             onClick={() => onShift(1)}
             aria-label="Next day"
-            className="w-8 h-8 rounded-md border border-[#ddd] bg-white text-[#006272] text-base cursor-pointer hover:bg-[#E6EEEF]"
+            className="w-8 h-8 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-base cursor-pointer hover:bg-[#e7f4ec]"
           >
             ›
           </button>

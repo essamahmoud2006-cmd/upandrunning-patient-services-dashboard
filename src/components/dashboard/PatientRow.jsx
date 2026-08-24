@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function PatientRow({ patient, onToggle, onNote, onPhone, onRemove }) {
   const meta = [patient.mrNo, patient.consultant, patient.reason].filter(Boolean).join(' · ');
   const phoneDigits = (patient.phone || '').replace(/[^0-9+]/g, '');
+
+  const [note, setNote] = useState(patient.note || '');
+  const [phone, setPhone] = useState(patient.phone || '');
+
+  useEffect(() => { setNote(patient.note || ''); }, [patient.id, patient.note]);
+  useEffect(() => { setPhone(patient.phone || ''); }, [patient.id, patient.phone]);
+
+  const commitNote = () => { if (note !== (patient.note || '')) onNote(patient.id, note); };
+  const commitPhone = () => { if (phone !== (patient.phone || '')) onPhone(patient.id, phone); };
+
   return (
     <div
       className={`flex items-start gap-2.5 px-2.5 py-2 border rounded-lg ${
@@ -25,8 +35,9 @@ export default function PatientRow({ patient, onToggle, onNote, onPhone, onRemov
       <input
         type="text"
         placeholder="Phone number"
-        value={patient.phone || ''}
-        onChange={(e) => onPhone(patient.id, e.target.value)}
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        onBlur={commitPhone}
         className="text-xs text-[#333] w-[118px] flex-shrink-0 px-1.5 py-1 rounded-md border border-transparent bg-transparent hover:border-[#ddd] hover:bg-white focus:border-[#ddd] focus:bg-white outline-none"
       />
       {phoneDigits && (
@@ -41,8 +52,10 @@ export default function PatientRow({ patient, onToggle, onNote, onPhone, onRemov
       <input
         type="text"
         placeholder="Note"
-        value={patient.note || ''}
-        onChange={(e) => onNote(patient.id, e.target.value)}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        onBlur={commitNote}
+        onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
         className="text-xs text-[#777] w-[160px] flex-shrink-0 border-transparent bg-transparent outline-none"
       />
       <button

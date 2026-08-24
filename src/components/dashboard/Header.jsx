@@ -116,7 +116,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
                 mode="single"
                 selected={calDate}
                 modifiers={{ hasData: dataDates }}
-                classNames={{ day_hasData: 'bg-[#fff3cd] !text-[#7a5c00] font-semibold' }}
+                modifiersClassNames={{ hasData: 'bg-[#fff3cd] !text-[#7a5c00] font-semibold' }}
                 onSelect={(d) => { if (d) { const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); onDateChange(`${y}-${m}-${day}`); setCalOpen(false); } }}
               />
             </PopoverContent>

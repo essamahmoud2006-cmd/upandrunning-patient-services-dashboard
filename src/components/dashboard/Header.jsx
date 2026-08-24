@@ -35,7 +35,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             type="date"
             value={date}
             onChange={(e) => onDateChange(e.target.value)}
-            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm text-[#333]"
+            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm text-[#333] w-[150px] focus:outline-none focus:border-[#006272]"
           />
           <button
             onClick={() => onShift(1)}

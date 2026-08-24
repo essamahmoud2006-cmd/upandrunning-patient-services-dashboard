@@ -21,6 +21,7 @@ export default function AllLocationsView({
   onImportFile,
   onImportPaste,
   onDismissSummary,
+  onResetImported,
   uploading,
 }) {
   const { rows, totals } = useMemo(() => {
@@ -53,6 +54,16 @@ export default function AllLocationsView({
     <>
       <ImportSummaryBanner summary={importSummary} onDismiss={onDismissSummary} />
       <ImportPanel date={date} onImportFile={onImportFile} onImportPaste={onImportPaste} uploading={uploading} />
+      {cancellations.length > 0 && (
+        <div className="flex justify-end mb-3">
+          <button
+            onClick={() => { if (window.confirm('Remove ALL imported cancellations for this date? This cannot be undone.')) onResetImported(); }}
+            className="text-[12px] font-semibold text-[#c0392b] border border-[#e6b8b0] bg-white rounded-md px-3 py-1.5 cursor-pointer hover:bg-[#fbeae7]"
+          >
+            Reset imported data
+          </button>
+        </div>
+      )}
 
       <SummaryCards
         items={[

@@ -263,6 +263,15 @@ export function useDashboardData(date) {
     setImportSummary({ totalNew, totalDup, totalUnmapped, perLocationNew, unmapped });
   };
 
+  const resetImportedData = async () => {
+    const ids = cancellations.map((p) => p.id);
+    if (!ids.length) return;
+    await base44.entities.Cancellation.deleteMany({ date });
+    const affected = [...new Set(cancellations.map((p) => p.location))];
+    affected.forEach((locKey) => addLog(locKey, 'Reset — cleared imported cancellations'));
+    setCancellations([]);
+  };
+
   return {
     loading,
     cancellations,
@@ -271,6 +280,7 @@ export function useDashboardData(date) {
     importSummary,
     setImportSummary,
     reload: fetchAll,
+    resetImportedData,
     adjustCounter,
     addPatientsFromText,
     toggleRecouped,

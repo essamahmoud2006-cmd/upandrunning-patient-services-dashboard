@@ -59,6 +59,7 @@ export default function Dashboard() {
           onImportFile={handleImportFile}
           onImportPaste={dash.importCsvReport}
           onDismissSummary={() => dash.setImportSummary(null)}
+          onResetImported={dash.resetImportedData}
           uploading={uploading}
         />
       ) : (

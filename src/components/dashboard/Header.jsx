@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { fmtDateHuman, todayStr } from '@/lib/dashboardData';
 
 function daysBetween(a, b) {
@@ -29,10 +32,17 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
   const backLabel = offset < 0 ? signed(offset) : '';
   const fwdLabel = offset > 0 ? signed(offset) : '';
   const [text, setText] = useState(toDisplay(date));
+  const [calOpen, setCalOpen] = useState(false);
 
   useEffect(() => {
     setText(toDisplay(date));
   }, [date]);
+
+  const calDate = (() => {
+    const [y, m, d] = (date || '').split('-').map(Number);
+    if (!y || !m || !d) return new Date();
+    return new Date(y, m - 1, d);
+  })();
 
   const commit = () => {
     const iso = parseDisplay(text);
@@ -80,6 +90,23 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           >
             Today
           </button>
+          <Popover open={calOpen} onOpenChange={setCalOpen}>
+            <PopoverTrigger asChild>
+              <button
+                aria-label="Pick date"
+                className="h-8 w-8 rounded-md border border-[#ddd] bg-white text-[#006272] cursor-pointer hover:bg-[#E6EEEF] flex items-center justify-center"
+              >
+                <CalendarIcon className="h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={calDate}
+                onSelect={(d) => { if (d) { const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); onDateChange(`${y}-${m}-${day}`); setCalOpen(false); } }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       <div className="text-[13px] text-[#777] mb-3.5">{fmtDateHuman(date)}</div>

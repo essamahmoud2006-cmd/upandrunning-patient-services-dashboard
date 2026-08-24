@@ -31,7 +31,7 @@ export default function LocationView({
         items={[
           { label: 'Carried from yesterday', value: carried },
           { label: 'Recouped', value: recoupedN, orange: true },
-          { label: 'Recoup rate', value: rate === null ? '—' : rate + '%', sub: rate !== null && rate >= 80 ? 'On target' : '' },
+          { label: 'Recoup rate', value: rate === null ? '—' : rate + '%', tone: rate === null ? null : rate >= 80 ? 'green' : 'red', sub: rate !== null && rate >= 80 ? 'On target' : '' },
           { label: 'New appointments today', value: total, orange: true },
         ]}
       />

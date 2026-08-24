@@ -6,7 +6,7 @@ export default function SummaryCards({ items }) {
       {items.map((c, i) => (
         <div key={i} className="bg-white border border-[#ddd] rounded-[10px] px-4 py-3.5">
           <div className="text-xs text-[#777] uppercase tracking-wide mb-1.5">{c.label}</div>
-          <div className={`text-[28px] font-bold ${c.orange ? 'text-[#E87722]' : 'text-[#006272]'}`}>{c.value}</div>
+          <div className={`text-[28px] font-bold ${c.tone === 'green' ? 'text-[#1e8449]' : c.tone === 'red' ? 'text-[#c0392b]' : c.orange ? 'text-[#E87722]' : 'text-[#006272]'}`}>{c.value}</div>
           {c.sub ? <div className="text-xs text-[#777] mt-1">{c.sub}</div> : null}
         </div>
       ))}

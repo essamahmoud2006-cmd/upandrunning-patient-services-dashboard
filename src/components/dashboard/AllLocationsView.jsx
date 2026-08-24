@@ -69,7 +69,7 @@ export default function AllLocationsView({
         items={[
           { label: 'Carried from yesterday', value: totals.carried },
           { label: 'Recouped', value: totals.recouped, orange: true },
-          { label: 'Recoup rate', value: totals.rate === null ? '—' : totals.rate + '%' },
+          { label: 'Recoup rate', value: totals.rate === null ? '—' : totals.rate + '%', tone: totals.rate === null ? null : totals.rate >= 80 ? 'green' : 'red' },
           { label: 'New appointments today', value: totals.nt, orange: true },
         ]}
       />
@@ -90,7 +90,7 @@ export default function AllLocationsView({
                 <td className="px-3 py-2.5 text-left">{r.loc.name}</td>
                 <td className="px-3 py-2.5 text-center">{r.carried}</td>
                 <td className="px-3 py-2.5 text-center">{r.recoupedN}</td>
-                <td className="px-3 py-2.5 text-center">{r.rate === null ? '—' : r.rate + '%'}</td>
+                <td className={`px-3 py-2.5 text-center font-semibold ${r.rate === null ? '' : r.rate >= 80 ? 'text-[#1e8449]' : 'text-[#c0392b]'}`}>{r.rate === null ? '—' : r.rate + '%'}</td>
                 <td className="px-3 py-2.5 text-center">{r.phone}</td>
                 <td className="px-3 py-2.5 text-center">{r.whatsapp}</td>
                 <td className="px-3 py-2.5 text-center">{r.referral}</td>
@@ -102,7 +102,7 @@ export default function AllLocationsView({
               <td className="px-3 py-2.5 text-left">All locations</td>
               <td className="px-3 py-2.5 text-center">{totals.carried}</td>
               <td className="px-3 py-2.5 text-center">{totals.recouped}</td>
-              <td className="px-3 py-2.5 text-center">{totals.rate === null ? '—' : totals.rate + '%'}</td>
+              <td className={`px-3 py-2.5 text-center ${totals.rate === null ? '' : totals.rate >= 80 ? 'text-[#1e8449]' : 'text-[#c0392b]'}`}>{totals.rate === null ? '—' : totals.rate + '%'}</td>
               <td className="px-3 py-2.5 text-center">{totals.phone}</td>
               <td className="px-3 py-2.5 text-center">{totals.whatsapp}</td>
               <td className="px-3 py-2.5 text-center">{totals.referral}</td>

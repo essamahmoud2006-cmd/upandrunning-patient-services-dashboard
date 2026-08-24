@@ -1,0 +1,33 @@
+{
+  "name": "DailyCounter",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "location": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "number",
+      "default": 0
+    },
+    "whatsapp": {
+      "type": "number",
+      "default": 0
+    },
+    "referral": {
+      "type": "number",
+      "default": 0
+    },
+    "waitlist": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "date",
+    "location"
+  ]
+}

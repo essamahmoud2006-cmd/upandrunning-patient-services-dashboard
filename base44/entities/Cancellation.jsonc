@@ -1,0 +1,40 @@
+{
+  "name": "Cancellation",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "location": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "mrNo": {
+      "type": "string"
+    },
+    "consultant": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "recouped": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "date",
+    "location",
+    "name"
+  ]
+}

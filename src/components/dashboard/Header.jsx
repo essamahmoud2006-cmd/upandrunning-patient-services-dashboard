@@ -1,7 +1,20 @@
 import React from 'react';
-import { fmtDateHuman } from '@/lib/dashboardData';
+import { fmtDateHuman, todayStr } from '@/lib/dashboardData';
+
+function daysBetween(a, b) {
+  const da = new Date(a + 'T00:00:00');
+  const db = new Date(b + 'T00:00:00');
+  return Math.round((da - db) / 86400000);
+}
+function signed(n) {
+  if (n > 0) return `+${n}`;
+  return `${n}`;
+}
 
 export default function Header({ date, onShift, onDateChange, onToday }) {
+  const offset = daysBetween(date, todayStr());
+  const backN = offset - 1;
+  const fwdN = offset + 1;
   return (
     <>
       <div className="flex justify-between items-start flex-wrap gap-3 mb-4">
@@ -13,9 +26,10 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <button
             onClick={() => onShift(-1)}
             aria-label="Previous day"
-            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-sm font-bold cursor-pointer hover:bg-[#fbeae7]"
+            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-sm font-bold cursor-pointer hover:bg-[#fbeae7] flex items-center gap-1"
           >
-            -1
+            <span className="text-base leading-none">‹</span>
+            <span>{signed(backN)}</span>
           </button>
           <input
             type="date"
@@ -26,9 +40,10 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <button
             onClick={() => onShift(1)}
             aria-label="Next day"
-            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-sm font-bold cursor-pointer hover:bg-[#e7f4ec]"
+            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-sm font-bold cursor-pointer hover:bg-[#e7f4ec] flex items-center gap-1"
           >
-            +1
+            <span className="text-base leading-none">›</span>
+            <span>{signed(fwdN)}</span>
           </button>
           <button
             onClick={onToday}

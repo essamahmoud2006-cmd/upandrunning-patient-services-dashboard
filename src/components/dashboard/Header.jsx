@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { base44 } from '@/api/base44Client';
 import { fmtDateHuman, todayStr } from '@/lib/dashboardData';
 
 function daysBetween(a, b) {
@@ -33,10 +34,21 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
   const fwdLabel = offset > 0 ? signed(offset) : '';
   const [text, setText] = useState(toDisplay(date));
   const [calOpen, setCalOpen] = useState(false);
+  const [dataDates, setDataDates] = useState([]);
 
   useEffect(() => {
     setText(toDisplay(date));
   }, [date]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const recs = await base44.entities.Cancellation.list('-created_date', 2000);
+        const set = new Set(recs.map((r) => r.date).filter(Boolean));
+        setDataDates([...set].map((s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }));
+      } catch (e) { /* ignore */ }
+    })();
+  }, []);
 
   const calDate = (() => {
     const [y, m, d] = (date || '').split('-').map(Number);
@@ -103,6 +115,8 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
               <Calendar
                 mode="single"
                 selected={calDate}
+                modifiers={{ hasData: dataDates }}
+                classNames={{ day_hasData: 'bg-[#fff3cd] !text-[#7a5c00] font-semibold' }}
                 onSelect={(d) => { if (d) { const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); onDateChange(`${y}-${m}-${day}`); setCalOpen(false); } }}
               />
             </PopoverContent>

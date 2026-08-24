@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { fmtDateHuman, todayStr } from '@/lib/dashboardData';
 
 function daysBetween(a, b) {
@@ -10,11 +10,36 @@ function signed(n) {
   if (n > 0) return `+${n}`;
   return `${n}`;
 }
+function toDisplay(iso) {
+  const [y, m, d] = (iso || '').split('-');
+  if (!y || !m || !d) return '';
+  return `${d}/${m}/${y}`;
+}
+function parseDisplay(text) {
+  const t = (text || '').trim();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  m = t.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  return '';
+}
 
 export default function Header({ date, onShift, onDateChange, onToday }) {
   const offset = daysBetween(date, todayStr());
   const backLabel = offset < 0 ? signed(offset) : '';
   const fwdLabel = offset > 0 ? signed(offset) : '';
+  const [text, setText] = useState(toDisplay(date));
+
+  useEffect(() => {
+    setText(toDisplay(date));
+  }, [date]);
+
+  const commit = () => {
+    const iso = parseDisplay(text);
+    if (iso) onDateChange(iso);
+    else setText(toDisplay(date));
+  };
+
   return (
     <>
       <div className="flex justify-between items-start flex-wrap gap-3 mb-4">
@@ -32,10 +57,14 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             {backLabel && <span>{backLabel}</span>}
           </button>
           <input
-            type="date"
-            value={date}
-            onChange={(e) => onDateChange(e.target.value)}
-            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm text-[#333] w-[150px] focus:outline-none focus:border-[#006272]"
+            type="text"
+            inputMode="numeric"
+            value={text}
+            placeholder="DD/MM/YYYY"
+            onChange={(e) => setText(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.currentTarget.blur(); } }}
+            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm text-[#333] w-[130px] focus:outline-none focus:border-[#006272] text-center"
           />
           <button
             onClick={() => onShift(1)}

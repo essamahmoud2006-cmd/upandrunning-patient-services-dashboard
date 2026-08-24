@@ -13,7 +13,8 @@ function signed(n) {
 
 export default function Header({ date, onShift, onDateChange, onToday }) {
   const offset = daysBetween(date, todayStr());
-  const label = offset === 0 ? '' : signed(offset);
+  const backLabel = offset < 0 ? signed(offset) : '';
+  const fwdLabel = offset > 0 ? signed(offset) : '';
   return (
     <>
       <div className="flex justify-between items-start flex-wrap gap-3 mb-4">
@@ -28,7 +29,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-sm font-bold cursor-pointer hover:bg-[#fbeae7] flex items-center gap-1"
           >
             <span className="text-base leading-none">‹</span>
-            {label && <span>{label}</span>}
+            {backLabel && <span>{backLabel}</span>}
           </button>
           <input
             type="date"
@@ -42,7 +43,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-sm font-bold cursor-pointer hover:bg-[#e7f4ec] flex items-center gap-1"
           >
             <span className="text-base leading-none">›</span>
-            {label && <span>{label}</span>}
+            {fwdLabel && <span>{fwdLabel}</span>}
           </button>
           <button
             onClick={onToday}

@@ -74,7 +74,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             onChange={(e) => setText(e.target.value)}
             onBlur={commit}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.currentTarget.blur(); } }}
-            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm text-[#333] w-[130px] focus:outline-none focus:border-[#006272] text-center"
+            className={`border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm font-semibold w-[130px] focus:outline-none focus:border-[#006272] text-center ${offset < 0 ? 'text-[#c0392b]' : offset > 0 ? 'text-[#1e8449]' : 'text-[#333]'}`}
           />
           <button
             onClick={() => onShift(1)}

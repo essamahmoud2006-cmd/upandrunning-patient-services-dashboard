@@ -18,10 +18,7 @@
         "waitlist"
       ]
     },
-    "name": {
-      "type": "string"
-    },
-    "phone": {
+    "mrNo": {
       "type": "string"
     },
     "timestamp": {
@@ -33,6 +30,6 @@
     "date",
     "location",
     "type",
-    "name"
+    "mrNo"
   ]
 }

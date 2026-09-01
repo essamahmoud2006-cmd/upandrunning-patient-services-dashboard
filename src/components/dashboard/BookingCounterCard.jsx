@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 
 export default function BookingCounterCard({ def, locKey, counter, bookings, onAdjust, onAddBooking, onRemoveBooking }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [mrNo, setMrNo] = useState('');
   const count = counter ? counter[def.field] || 0 : 0;
   const list = bookings || [];
 
   const submit = () => {
-    if (!name.trim()) return;
-    onAddBooking(locKey, def.field, name.trim(), phone.trim());
-    setName('');
-    setPhone('');
+    if (!mrNo.trim()) return;
+    onAddBooking(locKey, def.field, mrNo.trim());
+    setMrNo('');
     setOpen(false);
   };
 
@@ -40,17 +38,9 @@ export default function BookingCounterCard({ def, locKey, counter, bookings, onA
         <div className="flex flex-col gap-2 border-t border-[#eee] pt-2.5">
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Patient name"
-            onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-            className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-[13px] outline-none focus:border-[#006272]"
-          />
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Phone number"
+            value={mrNo}
+            onChange={(e) => setMrNo(e.target.value)}
+            placeholder="MR Number"
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
             className="border border-[#ddd] rounded-md px-2.5 py-1.5 text-[13px] outline-none focus:border-[#006272]"
           />
@@ -67,7 +57,7 @@ export default function BookingCounterCard({ def, locKey, counter, bookings, onA
         <div className="flex flex-col gap-1 border-t border-[#eee] pt-2 max-h-36 overflow-auto">
           {list.map((b) => (
             <div key={b.id} className="flex justify-between items-center text-xs gap-2">
-              <span className="text-[#333] truncate">{b.name}{b.phone ? ` · ${b.phone}` : ''}</span>
+              <span className="text-[#333] truncate">MR {b.mrNo}</span>
               <button
                 onClick={() => onRemoveBooking(b.id, locKey, def.field)}
                 aria-label="Remove"

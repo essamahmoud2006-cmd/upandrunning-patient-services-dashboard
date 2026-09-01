@@ -200,8 +200,8 @@ export function useDashboardData(date) {
     addLog(p.location, 'Removed — ' + p.name);
   };
 
-  const addBooking = async (locKey, type, name, phone) => {
-    const rec = await base44.entities.Booking.create({ date, location: locKey, type, name, phone, timestamp: new Date().toISOString() });
+  const addBooking = async (locKey, type, mrNo) => {
+    const rec = await base44.entities.Booking.create({ date, location: locKey, type, mrNo, timestamp: new Date().toISOString() });
     const existing = counters[locKey];
     if (existing) {
       const newVal = (existing[type] || 0) + 1;
@@ -209,7 +209,7 @@ export function useDashboardData(date) {
       setCounters((prev) => ({ ...prev, [locKey]: updated }));
     }
     const def = COUNTER_DEFS.find((c) => c.field === type);
-    addLog(locKey, (def ? def.name : type) + ': ' + name + (phone ? ' · ' + phone : ''));
+    addLog(locKey, (def ? def.name : type) + ': MR ' + mrNo);
     setBookings((prev) => {
       const byType = prev[locKey] ? { ...prev[locKey] } : {};
       byType[type] = [rec, ...(byType[type] || [])];

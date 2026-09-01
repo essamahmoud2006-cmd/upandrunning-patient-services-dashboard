@@ -99,12 +99,14 @@ export function useDashboardData(date) {
   const [logs, setLogs] = useState({});
   const [loading, setLoading] = useState(true);
   const [importSummary, setImportSummary] = useState(null);
+  const [bookings, setBookings] = useState({});
 
   const fetchAll = useCallback(async () => {
-    const [c, ctr, l] = await Promise.all([
+    const [c, ctr, l, b] = await Promise.all([
       base44.entities.Cancellation.filter({ date }, '-created_date', 2000),
       base44.entities.DailyCounter.filter({ date }, '-created_date', 100),
       base44.entities.ActivityLog.filter({ date }, '-created_date', 1000),
+      base44.entities.Booking.filter({ date }, '-created_date', 2000),
     ]);
     const ctrMap = {};
     ctr.forEach((r) => { ctrMap[r.location] = r; });
@@ -121,6 +123,13 @@ export function useDashboardData(date) {
     l.forEach((r) => { (logMap[r.location] = logMap[r.location] || []).push(r); });
     Object.values(logMap).forEach((arr) => arr.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
     setLogs(logMap);
+    const bMap = {};
+    b.forEach((r) => {
+      (bMap[r.location] = bMap[r.location] || {});
+      (bMap[r.location][r.type] = bMap[r.location][r.type] || []).push(r);
+    });
+    Object.values(bMap).forEach((byType) => Object.values(byType).forEach((arr) => arr.sort((a, b2) => new Date(b2.timestamp) - new Date(a.timestamp))));
+    setBookings(bMap);
   }, [date]);
 
   const load = useCallback(async () => {
@@ -189,6 +198,38 @@ export function useDashboardData(date) {
     await base44.entities.Cancellation.delete(patientId);
     setCancellations((prev) => prev.filter((x) => x.id !== patientId));
     addLog(p.location, 'Removed — ' + p.name);
+  };
+
+  const addBooking = async (locKey, type, name, phone) => {
+    const rec = await base44.entities.Booking.create({ date, location: locKey, type, name, phone, timestamp: new Date().toISOString() });
+    const existing = counters[locKey];
+    if (existing) {
+      const newVal = (existing[type] || 0) + 1;
+      const updated = await base44.entities.DailyCounter.update(existing.id, { [type]: newVal });
+      setCounters((prev) => ({ ...prev, [locKey]: updated }));
+    }
+    const def = COUNTER_DEFS.find((c) => c.field === type);
+    addLog(locKey, (def ? def.name : type) + ': ' + name + (phone ? ' · ' + phone : ''));
+    setBookings((prev) => {
+      const byType = prev[locKey] ? { ...prev[locKey] } : {};
+      byType[type] = [rec, ...(byType[type] || [])];
+      return { ...prev, [locKey]: byType };
+    });
+  };
+
+  const removeBooking = async (bookingId, locKey, type) => {
+    await base44.entities.Booking.delete(bookingId);
+    const existing = counters[locKey];
+    if (existing) {
+      const newVal = Math.max(0, (existing[type] || 0) - 1);
+      const updated = await base44.entities.DailyCounter.update(existing.id, { [type]: newVal });
+      setCounters((prev) => ({ ...prev, [locKey]: updated }));
+    }
+    setBookings((prev) => {
+      const byType = prev[locKey] ? { ...prev[locKey] } : {};
+      byType[type] = (byType[type] || []).filter((b) => b.id !== bookingId);
+      return { ...prev, [locKey]: byType };
+    });
   };
 
   const importCsvReport = async (text) => {
@@ -288,5 +329,8 @@ export function useDashboardData(date) {
     updatePatientPhone,
     removePatient,
     importCsvReport,
+    bookings,
+    addBooking,
+    removeBooking,
   };
 }

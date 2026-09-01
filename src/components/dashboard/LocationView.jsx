@@ -10,6 +10,7 @@ export default function LocationView({
   cancellations,
   counter,
   logs,
+  bookings,
   onAddPaste,
   onAddSingle,
   onToggle,
@@ -17,6 +18,8 @@ export default function LocationView({
   onPhone,
   onRemove,
   onAdjust,
+  onAddBooking,
+  onRemoveBooking,
 }) {
   const loc = LOCATIONS.find((l) => l.key === locKey);
   const carried = cancellations.length;
@@ -49,7 +52,7 @@ export default function LocationView({
       />
 
       <div className="text-sm font-bold text-[#006272] uppercase tracking-wide mt-6 mb-2.5">Tap to log</div>
-      <CounterGrid counter={ctr} onAdjust={onAdjust} />
+      <CounterGrid counter={ctr} bookings={bookings} onAdjust={onAdjust} onAddBooking={onAddBooking} onRemoveBooking={onRemoveBooking} />
 
       <div className="text-sm font-bold text-[#006272] uppercase tracking-wide mt-6 mb-2.5">Activity log — {loc.name}</div>
       <ActivityLogBox logs={logs} />

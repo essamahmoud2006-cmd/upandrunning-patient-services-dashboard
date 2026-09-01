@@ -1,0 +1,38 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "location": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "whatsapp",
+        "referral",
+        "waitlist"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "date",
+    "location",
+    "type",
+    "name"
+  ]
+}

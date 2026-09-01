@@ -75,6 +75,9 @@ export default function Dashboard() {
           onPhone={dash.updatePatientPhone}
           onRemove={dash.removePatient}
           onAdjust={dash.adjustCounter}
+          bookings={dash.bookings[activeTab] || {}}
+          onAddBooking={dash.addBooking}
+          onRemoveBooking={dash.removeBooking}
         />
       )}
       <div className="mt-7 text-center text-xs text-[#777]">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { Image } from '@/components/ui/image';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { base44 } from '@/api/base44Client';
@@ -67,11 +66,10 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
     <>
       <div className="flex justify-between items-start flex-wrap gap-3 mb-4">
         <div className="leading-tight">
-          <Image
+          <img
             src="https://media.base44.com/images/public/6a8be71cffb7591e161675e6/ccebb5acb_Untitleddesign.png"
             alt="UPANDRUNNING"
-            className="h-12 w-[200px]"
-            fittingType="fit"
+            className="h-12 w-auto object-contain"
           />
           <div className="text-[#777] text-[13px] tracking-wide uppercase mt-1">Patient Services Daily Dashboard</div>
         </div>

@@ -69,7 +69,7 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <img
             src="https://media.base44.com/images/public/6a8be71cffb7591e161675e6/ccebb5acb_Untitleddesign.png"
             alt="UPANDRUNNING"
-            className="h-12 w-auto object-contain"
+            className="h-20 w-auto object-contain"
           />
           <div className="text-[#777] text-[13px] tracking-wide uppercase mt-1">Patient Services Daily Dashboard</div>
         </div>

@@ -65,12 +65,12 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
   return (
     <>
       <div className="flex justify-between items-start flex-wrap gap-3 mb-4">
-        <div className="flex items-center gap-3">
+        <div className="leading-tight">
           <img
             src="https://media.base44.com/images/public/6a8be71cffb7591e161675e6/ccebb5acb_Untitleddesign.png"
             alt="UPANDRUNNING"
             className="h-20 w-auto object-contain" />
-          <div className="text-[#777] text-[13px] tracking-wide uppercase">Patient Services Daily Dashboard</div>
+          <div className="text-[#777] text-[13px] tracking-wide uppercase mt-1">Patient Services Daily Dashboard</div>
         </div>
         <div className="flex items-center gap-2">
           <button

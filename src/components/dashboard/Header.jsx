@@ -45,8 +45,8 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
       try {
         const recs = await base44.entities.Cancellation.list('-created_date', 2000);
         const set = new Set(recs.map((r) => r.date).filter(Boolean));
-        setDataDates([...set].map((s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }));
-      } catch (e) { /* ignore */ }
+        setDataDates([...set].map((s) => {const [y, m, d] = s.split('-').map(Number);return new Date(y, m - 1, d);}));
+      } catch (e) {/* ignore */}
     })();
   }, []);
 
@@ -58,8 +58,8 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
 
   const commit = () => {
     const iso = parseDisplay(text);
-    if (iso) onDateChange(iso);
-    else setText(toDisplay(date));
+    if (iso) onDateChange(iso);else
+    setText(toDisplay(date));
   };
 
   return (
@@ -69,16 +69,16 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
           <img
             src="https://media.base44.com/images/public/6a8be71cffb7591e161675e6/ccebb5acb_Untitleddesign.png"
             alt="UPANDRUNNING"
-            className="h-20 w-auto object-contain"
-          />
+            className="h-20 w-auto object-contain pr-1" />
+          
           <div className="text-[#777] text-[13px] tracking-wide uppercase mt-1">Patient Services Daily Dashboard</div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onShift(-1)}
             aria-label="Previous day"
-            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-sm font-bold cursor-pointer hover:bg-[#fbeae7] flex items-center gap-1"
-          >
+            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#c0392b] text-sm font-bold cursor-pointer hover:bg-[#fbeae7] flex items-center gap-1">
+            
             <span className="text-base leading-none">‹</span>
             {backLabel && <span>{backLabel}</span>}
           </button>
@@ -89,29 +89,29 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
             placeholder="DD/MM/YYYY"
             onChange={(e) => setText(e.target.value)}
             onBlur={commit}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.currentTarget.blur(); } }}
-            className={`border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm font-semibold w-[130px] focus:outline-none focus:border-[#006272] text-center ${offset < 0 ? 'text-[#c0392b]' : offset > 0 ? 'text-[#1e8449]' : 'text-[#333]'}`}
-          />
+            onKeyDown={(e) => {if (e.key === 'Enter') {e.currentTarget.blur();}}}
+            className={`border border-[#ddd] rounded-md px-2.5 py-1.5 text-sm font-semibold w-[130px] focus:outline-none focus:border-[#006272] text-center ${offset < 0 ? 'text-[#c0392b]' : offset > 0 ? 'text-[#1e8449]' : 'text-[#333]'}`} />
+          
           <button
             onClick={() => onShift(1)}
             aria-label="Next day"
-            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-sm font-bold cursor-pointer hover:bg-[#e7f4ec] flex items-center gap-1"
-          >
+            className="h-8 px-2 rounded-md border border-[#ddd] bg-white text-[#1e8449] text-sm font-bold cursor-pointer hover:bg-[#e7f4ec] flex items-center gap-1">
+            
             <span className="text-base leading-none">›</span>
             {fwdLabel && <span>{fwdLabel}</span>}
           </button>
           <button
             onClick={onToday}
-            className="border border-[#006272] text-[#006272] bg-white rounded-md px-2.5 py-1.5 text-[13px] cursor-pointer hover:bg-[#E6EEEF]"
-          >
+            className="border border-[#006272] text-[#006272] bg-white rounded-md px-2.5 py-1.5 text-[13px] cursor-pointer hover:bg-[#E6EEEF]">
+            
             Today
           </button>
           <Popover open={calOpen} onOpenChange={setCalOpen}>
             <PopoverTrigger asChild>
               <button
                 aria-label="Pick date"
-                className="h-8 w-8 rounded-md border border-[#ddd] bg-white text-[#006272] cursor-pointer hover:bg-[#E6EEEF] flex items-center justify-center"
-              >
+                className="h-8 w-8 rounded-md border border-[#ddd] bg-white text-[#006272] cursor-pointer hover:bg-[#E6EEEF] flex items-center justify-center">
+                
                 <CalendarIcon className="h-4 w-4" />
               </button>
             </PopoverTrigger>
@@ -121,13 +121,13 @@ export default function Header({ date, onShift, onDateChange, onToday }) {
                 selected={calDate}
                 modifiers={{ hasData: dataDates }}
                 modifiersClassNames={{ hasData: 'bg-[#fff3cd] !text-[#7a5c00] font-semibold' }}
-                onSelect={(d) => { if (d) { const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); onDateChange(`${y}-${m}-${day}`); setCalOpen(false); } }}
-              />
+                onSelect={(d) => {if (d) {const y = d.getFullYear();const m = String(d.getMonth() + 1).padStart(2, '0');const day = String(d.getDate()).padStart(2, '0');onDateChange(`${y}-${m}-${day}`);setCalOpen(false);}}} />
+              
             </PopoverContent>
           </Popover>
         </div>
       </div>
       <div className="text-[13px] text-[#777] mb-3.5">{fmtDateHuman(date)}</div>
-    </>
-  );
+    </>);
+
 }

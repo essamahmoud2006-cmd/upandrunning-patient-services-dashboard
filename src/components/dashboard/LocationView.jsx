@@ -3,6 +3,7 @@ import { LOCATIONS, newTotal } from '@/lib/dashboardData';
 import SummaryCards from './SummaryCards';
 import CounterGrid from './CounterGrid';
 import ActivityLogBox from './ActivityLogBox';
+import CancellationsPanel from './CancellationsPanel';
 
 export default function LocationView({
   locKey,
@@ -36,6 +37,18 @@ export default function LocationView({
           { label: 'Recoup rate', value: rate === null ? '—' : rate + '%', tone: rate === null ? null : rate >= 80 ? 'green' : 'red', sub: rate !== null && rate >= 80 ? 'On target' : '' },
           { label: 'New appointments today', value: total, orange: true },
         ]}
+      />
+
+      <CancellationsPanel
+        locKey={locKey}
+        locName={loc.name}
+        cancellations={cancellations}
+        onAddPaste={onAddPaste}
+        onAddSingle={onAddSingle}
+        onToggle={onToggle}
+        onNote={onNote}
+        onPhone={onPhone}
+        onRemove={onRemove}
       />
 
       <div className="text-sm font-bold text-[#006272] uppercase tracking-wide mt-6 mb-2.5">Tap to log</div>
